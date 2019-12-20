@@ -2,9 +2,9 @@
 monitor and adjust thread pool
 
 ## module description
-1. illegal-thread-sdk, report thread pool matrix, update thread pool via notification, provide thread pool creation ability.   
-2. illegal-meta-server, provide thread pool info, collect thread pool matrix and do alarm, and notify config change.  
-3. illegal-admin-server, view and manage thread pool info.   
+1. illegal-thread-sdk, report thread pool metric, update thread pool via notification, provide thread pool creation ability.   
+2. illegal-thread-meta, provide thread pool info, collect thread pool metric and do alarm, and notify config change.  
+3. illegal-thread-admin, view and manage thread pool info.   
 
 ## function
 1. sdk side    
