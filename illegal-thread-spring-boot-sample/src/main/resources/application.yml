@@ -1,0 +1,8 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: illegal-thread-spring-boot-sample
+logging:
+  level:
+    root: debug
