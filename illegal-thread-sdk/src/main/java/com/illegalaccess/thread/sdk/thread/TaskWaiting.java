@@ -20,4 +20,20 @@ public class TaskWaiting {
         data.remove(task);
         return start;
     }
+    
+    public static void taskEnQueue(Object task) {
+        
+    }
+    
+    public static void taskOutOfQueue(Object task) {
+        
+    }
+    
+    public static void taskStartExec(Object task) {
+        
+    }
+    
+    public static void taskEndExec(Object task) {
+        
+    }
 }
