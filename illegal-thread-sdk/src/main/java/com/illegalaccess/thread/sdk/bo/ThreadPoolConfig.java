@@ -2,12 +2,16 @@ package com.illegalaccess.thread.sdk.bo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created by xiao on 2019/12/21.
  * 线程池的配置信息
  */
 @Data
-public class ThreadPoolConfigBO {
+public class ThreadPoolConfig implements Serializable {
+
+    private static final long serialVersionUID = -3716710247403047604L;
 
     private String poolName;
     // 核心线程数
@@ -18,4 +22,6 @@ public class ThreadPoolConfigBO {
     private int keepAliveTime;
     // 阻塞队列的长度
     private int queueLength;
+
+    private ThreadPoolAlarmConfig alarmConfig;
 }

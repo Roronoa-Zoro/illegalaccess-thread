@@ -1,6 +1,7 @@
 package com.illegalaccess.thread.sdk.thread;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,5 +26,9 @@ public class NamedExecutors {
 
     public static ExecutorService newThreadPoolExecutor(String threadPoolName, int coreSize, int maxSize, int keepAliveTime, TimeUnit unit, int queueLength) {
         return new NamedThreadPoolExecutor(threadPoolName, coreSize, maxSize, keepAliveTime, unit, new NamedBoundedBlockingQueue<>(threadPoolName, queueLength));
+    }
+
+    public static ExecutorService newThreadPoolExecutor(String threadPoolName, int coreSize, int maxSize, int keepAliveTime, TimeUnit unit, int queueLength, RejectedExecutionHandler rejectedExecutionHandler) {
+        return new NamedThreadPoolExecutor(threadPoolName, coreSize, maxSize, keepAliveTime, unit, new NamedBoundedBlockingQueue<>(threadPoolName, queueLength), rejectedExecutionHandler);
     }
 }

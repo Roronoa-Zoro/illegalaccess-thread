@@ -1,6 +1,6 @@
 package com.illegalaccess.thread.sdk.support;
 
-import com.illegalaccess.thread.sdk.bo.ThreadPoolReportBO;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolReportReq;
 import com.illegalaccess.thread.sdk.metric.ThreadPoolMetric;
 import com.illegalaccess.thread.sdk.metric.ThreadTaskMetric;
 
@@ -42,10 +42,10 @@ public enum ThreadPoolMetricCollector {
         }
     }
 
-    public ThreadPoolReportBO toReportBO() {
+    public ThreadPoolReportReq toReportBO() {
         readWriteLock.writeLock().lock();
         try {
-            ThreadPoolReportBO reportBO = new ThreadPoolReportBO();
+            ThreadPoolReportReq reportBO = new ThreadPoolReportReq();
 
             reportBO.setThreadPoolMetrics(threadPoolMetrics);
             threadPoolMetrics.clear();

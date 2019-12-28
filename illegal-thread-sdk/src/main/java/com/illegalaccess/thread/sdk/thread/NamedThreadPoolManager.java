@@ -35,7 +35,7 @@ public class NamedThreadPoolManager {
 
     // todo
     @Subscribe
-    public void threadPoolConfigChangeEventListener() {
+    public void threadPoolConfigChangeEventListener(String str) {
 
     }
 

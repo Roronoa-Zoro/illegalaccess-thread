@@ -64,4 +64,25 @@ public class NamedThreadPoolExecutor extends ThreadPoolExecutor {
     public String getThreadPoolName() {
         return threadPoolName;
     }
+
+
+    public static class NamedAbortPolicy extends AbortPolicy implements NamedRejectedExecutionHandler {
+        public NamedAbortPolicy() {
+            super();
+        }
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            System.out.println("");
+            super.rejectedExecution(r, e);
+        }
+    }
+
+    public static class NamedDiscardPolicy extends DiscardPolicy implements NamedRejectedExecutionHandler {
+
+    }
+
+    public static class NamedDiscardOldestPolicy extends DiscardOldestPolicy implements NamedRejectedExecutionHandler {
+
+    }
 }

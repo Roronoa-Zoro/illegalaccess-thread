@@ -1,6 +1,6 @@
 package com.illegalaccess.thread.sdk.support;
 
-import com.illegalaccess.thread.sdk.bo.ThreadPoolReportBO;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolReportReq;
 import com.illegalaccess.thread.sdk.metric.ThreadTaskMetric;
 import com.illegalaccess.thread.sdk.thread.NamedBoundedBlockingDeque;
 import com.illegalaccess.thread.sdk.thread.NamedBoundedBlockingQueue;
@@ -21,7 +21,7 @@ public enum MetricPipeline {
     private BlockingDeque<ThreadTaskMetric> blockingDeque = new NamedBoundedBlockingDeque<>();
 
     // todo 有瑕疵， 并没有和线程池挂钩
-    private BlockingQueue<ThreadPoolReportBO> metricReportQueue = new NamedBoundedBlockingQueue<>(SdkConstants.INNER_POOL);
+    private BlockingQueue<ThreadPoolReportReq> metricReportQueue = new NamedBoundedBlockingQueue<>(SdkConstants.INNER_POOL);
 
     public void transferThreadTaskMetric(ThreadTaskMetric threadTaskMetric) {
         blockingDeque.add(threadTaskMetric);
@@ -35,11 +35,11 @@ public enum MetricPipeline {
         return blockingDeque.poll(100, TimeUnit.MILLISECONDS);
     }
 
-    public void transferThreadMetricReport(ThreadPoolReportBO reportBO) {
+    public void transferThreadMetricReport(ThreadPoolReportReq reportBO) {
         metricReportQueue.offer(reportBO);
     }
 
-    public ThreadPoolReportBO fetchThreadMetricReport() throws InterruptedException {
+    public ThreadPoolReportReq fetchThreadMetricReport() throws InterruptedException {
         return metricReportQueue.poll(100, TimeUnit.MILLISECONDS);
     }
 

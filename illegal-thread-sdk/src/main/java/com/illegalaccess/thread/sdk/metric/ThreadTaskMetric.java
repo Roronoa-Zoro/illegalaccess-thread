@@ -25,5 +25,7 @@ public class ThreadTaskMetric {
     // 任务执行的耗时，单位毫秒
     private int executionCost;
 
+    private boolean rejected = false;
+
     private LocalDateTime collectTime;
 }

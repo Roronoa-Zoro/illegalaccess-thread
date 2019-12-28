@@ -15,6 +15,26 @@ import java.util.concurrent.*;
 public class ThreadTest {
 
     @Test
+    public void policyTest() throws InterruptedException {
+        ExecutorService es = NamedExecutors.newThreadPoolExecutor("test", 1,2, 10, TimeUnit.SECONDS, 5, new ThreadPoolExecutor.AbortPolicy());
+        for (int i = 0; i < 10; i++) {
+            es.submit(() -> {
+                System.out.println(Thread.currentThread().getName() + " begin....");
+                try {
+                    TimeUnit.SECONDS.sleep(15);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Thread.currentThread().getName() + " end....");
+            });
+        }
+
+        es.shutdown();
+        TimeUnit.MINUTES.sleep(5);
+    }
+
+
+    @Test
     public void postTest() throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         Map<String, Object> map = new HashMap();
