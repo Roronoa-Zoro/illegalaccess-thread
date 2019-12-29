@@ -1,14 +1,19 @@
 package com.illegalaccess.thread.sdk.thread;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolAlarmConfig;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolConfig;
 import com.illegalaccess.thread.sdk.task.CollectAlarmTask;
 import com.illegalaccess.thread.sdk.task.CollectMetricTask;
 import com.illegalaccess.thread.sdk.task.ReportMetricTask;
 import com.illegalaccess.thread.sdk.utils.SdkConstants;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -16,7 +21,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TracedThreadPoolManager {
 
-    private CopyOnWriteArrayList<TracedThreadPoolExecutor> tracedThreadPoolExecutors = new CopyOnWriteArrayList<>();
+//    private CopyOnWriteArrayList<TracedThreadPoolExecutor> tracedThreadPoolExecutors = new CopyOnWriteArrayList<>();
+    private ConcurrentMap<String, TracedThreadPoolExecutor> tracedThreadPoolExecutors = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, ThreadPoolConfig> threadPoolConfigMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, ThreadPoolAlarmConfig> threadPoolAlarmConfigMap = new ConcurrentHashMap<>();
     private AtomicBoolean taskStarted = new AtomicBoolean(false);
     private ExecutorService innerThreadPool;
 
@@ -29,13 +37,49 @@ public class TracedThreadPoolManager {
         任务3：异步调用meta-server数据上报接口
          */
         TracedThreadPoolExecutor executor = arg;
-        tracedThreadPoolExecutors.add(executor);
+        tracedThreadPoolExecutors.put(executor.getThreadPoolName(), executor);
         startCollectTask();
     }
 
     // todo
     @Subscribe
-    public void threadPoolConfigChangeEventListener(String str) {
+    public void threadPoolConfigChangeEventListener(List<ThreadPoolConfig> threadPoolConfigs) {
+        if (threadPoolConfigs == null || threadPoolConfigs.isEmpty()) {
+            return;
+        }
+
+
+        for (ThreadPoolConfig threadPoolConfig : threadPoolConfigs) {
+            ThreadPoolConfig localPoolConfig = threadPoolConfigMap.get(threadPoolConfig.getPoolName());
+            if (localPoolConfig == null) { // 通过meta server配置的线程池，先触发的这个事件
+                threadPoolConfigMap.put(threadPoolConfig.getPoolName(), threadPoolConfig);
+                continue;
+            }
+            if (threadPoolConfig.getVersion() == localPoolConfig.getVersion()) {
+                continue; // config is not changed
+            }
+
+            threadPoolConfigMap.put(threadPoolConfig.getPoolName(), threadPoolConfig);
+            TracedThreadPoolExecutor executor = tracedThreadPoolExecutors.get(localPoolConfig.getPoolName());
+            if (executor.getCorePoolSize() != threadPoolConfig.getCoreSize()) {
+                executor.setCorePoolSize(threadPoolConfig.getCoreSize());
+            }
+            if (executor.getMaximumPoolSize() != threadPoolConfig.getMaxSize()) {
+                executor.setMaximumPoolSize(threadPoolConfig.getMaxSize());
+            }
+            // todo 修改blocking queue容量
+
+
+            ThreadPoolAlarmConfig localPoolAlarm = threadPoolAlarmConfigMap.get(threadPoolConfig.getPoolName());
+            if (localPoolAlarm == null) { // 新增的
+                threadPoolAlarmConfigMap.put(threadPoolConfig.getPoolName(), threadPoolConfig.getAlarmConfig());
+                continue;
+            }
+            if (localPoolAlarm.getVersion() != threadPoolConfig.getAlarmConfig().getVersion()) {
+                threadPoolAlarmConfigMap.put(threadPoolConfig.getPoolName(), threadPoolConfig.getAlarmConfig());
+            }
+        }
+
 
     }
 
@@ -52,7 +96,8 @@ public class TracedThreadPoolManager {
         }
     }
 
-    public CopyOnWriteArrayList<TracedThreadPoolExecutor> getTracedThreadPoolExecutors() {
-        return tracedThreadPoolExecutors;
+    public Collection<TracedThreadPoolExecutor> getTracedThreadPoolExecutors() {
+
+        return tracedThreadPoolExecutors.values();
     }
 }

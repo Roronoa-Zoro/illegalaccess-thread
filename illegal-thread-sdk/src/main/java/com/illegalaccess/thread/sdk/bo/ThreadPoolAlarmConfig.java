@@ -1,5 +1,7 @@
 package com.illegalaccess.thread.sdk.bo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -8,6 +10,7 @@ import java.io.Serializable;
  * 1.按拒绝次数报警，连续发生N次拒绝任务，则报警
  * 2 按执行时间报警，有N次任务执行时间超过M毫秒，则报警
  */
+@Data
 public class ThreadPoolAlarmConfig implements Serializable {
     private static final long serialVersionUID = -9089406450663761038L;
 
@@ -31,4 +34,7 @@ public class ThreadPoolAlarmConfig implements Serializable {
      * 当 alarmConfigType = Task_Cost_Strategy 生效
      */
     private int execThreshold;
+
+
+    private int version;
 }

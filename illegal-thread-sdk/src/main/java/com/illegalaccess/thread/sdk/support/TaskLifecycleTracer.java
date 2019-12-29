@@ -148,6 +148,6 @@ public class TaskLifecycleTracer {
     }
 
     private static boolean needTrace(String threadPoolName) {
-        return innerPoolNames.get(threadPoolName) == null;
+        return (threadPoolName != null) && (innerPoolNames.get(threadPoolName) == null);
     }
 }

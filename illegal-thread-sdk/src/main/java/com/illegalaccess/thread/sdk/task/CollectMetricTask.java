@@ -12,6 +12,7 @@ import com.illegalaccess.thread.sdk.utils.SdkConstants;
 import lombok.SneakyThrows;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,7 +64,7 @@ public class CollectMetricTask implements Runnable {
             }
 
             // todo 获取线程池的运行时数据
-            CopyOnWriteArrayList<TracedThreadPoolExecutor> executors = tracedThreadPoolManager.getTracedThreadPoolExecutors();
+            Collection<TracedThreadPoolExecutor> executors = tracedThreadPoolManager.getTracedThreadPoolExecutors();
             executors.forEach(executor -> {
                 ThreadPoolMetric poolMetric = new ThreadPoolMetric();
                 poolMetric.setPoolName(executor.getThreadPoolName());
