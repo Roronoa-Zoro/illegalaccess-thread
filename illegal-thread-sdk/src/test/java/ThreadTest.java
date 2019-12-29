@@ -1,36 +1,66 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.illegalaccess.thread.sdk.thread.NamedBoundedBlockingQueue;
-import com.illegalaccess.thread.sdk.thread.NamedExecutors;
+import com.illegalaccess.thread.sdk.support.MetricPipeline;
+import com.illegalaccess.thread.sdk.support.TaskLifecycleSavepoint;
+import com.illegalaccess.thread.sdk.thread.*;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
  * Created by xiao on 2019/12/20.
  */
 public class ThreadTest {
+    @Test
+    public void futureTest() {
+        Set<Integer> set = new HashSet<>();
+        int loop = 1;
+        int cnt = 0;
+
+        for (int i = 0; i < loop; i++) {
+            FutureTask<String> ft = new FutureTask<String>(() -> UUID.randomUUID().toString());
+            System.out.println("ft===" + ft);
+            boolean seted = set.add(ft.hashCode());
+            if (!seted) {
+//                System.out.println("found same toString=" + i);
+//                break;
+                cnt++;
+            }
+        }
+        System.out.println(set.size() + ", cnt=" + cnt + ",=");
+    }
+
 
     @Test
     public void policyTest() throws InterruptedException {
-        ExecutorService es = NamedExecutors.newThreadPoolExecutor("test", 1,2, 10, TimeUnit.SECONDS, 5, new ThreadPoolExecutor.AbortPolicy());
-        for (int i = 0; i < 10; i++) {
-            es.submit(() -> {
-                System.out.println(Thread.currentThread().getName() + " begin....");
+        TracedThreadPoolExecutor es = (TracedThreadPoolExecutor) TracedExecutors.newThreadPoolExecutor("test", 1,2, 10, TimeUnit.SECONDS, 5);
+//        ThreadPoolExecutor es = new ThreadPoolExecutor(1, 2, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(5));
+        for (int i = 0; i < 1; i++) {
+            Runnable r = () -> {
                 try {
-                    TimeUnit.SECONDS.sleep(15);
+                    TimeUnit.SECONDS.sleep(1);
+                    System.out.println("hehe......");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println(Thread.currentThread().getName() + " end....");
-            });
+            };
+            TraceRunnable tr = new TraceRunnable(r);
+            es.submit(tr);
         }
 
-        es.shutdown();
+//        int i = 0;
+//        while (i < 50) {
+//            System.out.println(es.getActiveCount() + ", " + es.getQueue().size());
+//            TimeUnit.MILLISECONDS.sleep(100);
+//            i++;
+//        }
+        TaskLifecycleSavepoint sv = new TaskLifecycleSavepoint();
+        sv.setThreadPoolName("test");
+        MetricPipeline.Instance.emit(MetricPipeline.Instance.INNER_SAVE_POINT_QUEUE, sv);
         TimeUnit.MINUTES.sleep(5);
+        es.shutdown();
     }
 
 
@@ -43,7 +73,7 @@ public class ThreadTest {
 
     @Test
     public void queueTest() {
-        NamedBoundedBlockingQueue<String> queue = new NamedBoundedBlockingQueue<>("ss");
+        TracedBoundedBlockingQueue<String> queue = new TracedBoundedBlockingQueue<>("ss");
         queue.add("aaa");
         queue.add("bbb");
         queue.add("ccc");
@@ -76,7 +106,7 @@ public class ThreadTest {
 
     @Test
     public void test() throws InterruptedException {
-        ExecutorService es = NamedExecutors.newSingleThreadPoolExecutor("test");
+        ExecutorService es = TracedExecutors.newSingleThreadPoolExecutor("test");
         for (int i = 0; i < 10; i++) {
 //            es.submit(() -> {
 //                try {

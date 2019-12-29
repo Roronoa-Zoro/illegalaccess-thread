@@ -13,3 +13,9 @@ monitor and adjust thread pool
 2. server side   
 2.1 it collect reported meta data, and can do alert according to configuration threshold   
 2.2 user can modify thread pool param, and these changes can be applied to application's thread pool    
+
+## data flow
+1. collecting data from BlockingQueue/ThreadPool, then emit to Pipeline,  
+2. then CollectMetricTask fetch data from Pipeline,   
+3. and making calculation, and emit data and reportData to Pipeline,   
+4. then CollectAlarmTask and ReportMetricTask fetch their interested data from Pipeline.   

@@ -1,7 +1,7 @@
 package com.illegalaccess.thread.sdk.alarm;
 
 import com.illegalaccess.thread.sdk.bo.ThreadPoolAlarmConfig;
-import com.illegalaccess.thread.sdk.thread.NamedThreadPoolExecutor;
+import com.illegalaccess.thread.sdk.thread.TracedThreadPoolExecutor;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public interface ThreadPoolAlarmStrategy extends Serializable {
 
-    boolean triggerAlarm(NamedThreadPoolExecutor executor, ThreadPoolAlarmConfig alarmConfig);
+    boolean triggerAlarm(TracedThreadPoolExecutor executor, ThreadPoolAlarmConfig alarmConfig);
 //    private String poolName;
 
 }

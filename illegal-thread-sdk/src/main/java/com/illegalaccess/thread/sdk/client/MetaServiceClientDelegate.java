@@ -13,9 +13,7 @@ import java.net.URLConnection;
  */
 public class MetaServiceClientDelegate {
 
-    private ObjectMapper om = new ObjectMapper();
-
-    private HttpURLConnection initConnection() {
+    private HttpURLConnection initConnection(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         URLConnection urlConnection = url.openConnection();
         HttpURLConnection connection = (HttpURLConnection) urlConnection;
@@ -37,7 +35,7 @@ public class MetaServiceClientDelegate {
     }
     
     
-    private String readData(HttpURLConnection connection) {
+    private String readData(HttpURLConnection connection) throws IOException {
         //对outputStream的写操作，又必须要在inputStream的读操作之前
         InputStream inputStream = connection.getInputStream();// <===注意，实际发送请求的代码段就在这里
 //        IOUtils.read()
@@ -54,8 +52,8 @@ public class MetaServiceClientDelegate {
         return response.toString();
     }
     
-    public String doGet(String urlStr, String reqData) {
-        HttpURLConnection connection = initConnection();
+    public String doGet(String urlStr, String reqData) throws IOException {
+        HttpURLConnection connection = initConnection(urlStr);
         // todo 
         String response = readData(connection);
         return response;

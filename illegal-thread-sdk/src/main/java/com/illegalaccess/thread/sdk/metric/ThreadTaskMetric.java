@@ -21,9 +21,9 @@ public class ThreadTaskMetric {
 
     private String poolName;
     // 在阻塞队列里面等待执行花费的时间，单位 毫秒
-    private int waitingCost;
+    private long waitingCost;
     // 任务执行的耗时，单位毫秒
-    private int executionCost;
+    private long executionCost;
 
     private boolean rejected = false;
 

@@ -1,8 +1,8 @@
 package com.illegalaccess.thread.sdk.support;
 
 import com.google.common.eventbus.EventBus;
-import com.illegalaccess.thread.sdk.thread.NamedThreadPoolExecutor;
-import com.illegalaccess.thread.sdk.thread.NamedThreadPoolManager;
+import com.illegalaccess.thread.sdk.thread.TracedThreadPoolExecutor;
+import com.illegalaccess.thread.sdk.thread.TracedThreadPoolManager;
 
 
 /**
@@ -14,14 +14,14 @@ public enum NamedThreadPoolEventSource {
 
     private EventBus eventBus = new EventBus();
 
-    private NamedThreadPoolManager eventSubscriber = new NamedThreadPoolManager();
+    private TracedThreadPoolManager eventSubscriber = new TracedThreadPoolManager();
 
     NamedThreadPoolEventSource() {
         eventBus.register(eventSubscriber);
     }
 
 
-    public void publishNamedThreadPoolCreationEvent(NamedThreadPoolExecutor executor) {
+    public void publishNamedThreadPoolCreationEvent(TracedThreadPoolExecutor executor) {
         eventBus.post(executor);
     }
 

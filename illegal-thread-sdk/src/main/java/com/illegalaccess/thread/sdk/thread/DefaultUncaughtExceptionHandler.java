@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 public class DefaultUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private Logger logger = LoggerFactory.getLogger(DefaultUncaughtExceptionHandler.class);
+
     public void uncaughtException(Thread t, Throwable e) {
+        e.printStackTrace();
         logger.error("there is an exception for thread name:{}", t.getName(), e);
     }
 }

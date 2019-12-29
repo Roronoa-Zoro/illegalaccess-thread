@@ -28,10 +28,12 @@ public class ConfigUtil {
     public static int COLLECT_INTERVAL                                                               ;
     // 收集线程池运行时数据的 最小时间间隔，5秒
     public static int MIN_COLLECT_INTERVAL                   = 5                                     ;
+    public static int DEFAULT_COLLECT_INTERVAL               = 15                                     ;
 
     // 数据收集几次之后进行上报
     public static int REPORT_CYCLE                                                                   ;
     public static int MIN_REPORT_CYCLE                       = 4                                     ;
+    public static int DEFAULT_REPORT_CYCLE                   = 4                                     ;
 
     private static AtomicBoolean propLoad = new AtomicBoolean(false);
     private static Properties props = new Properties();
@@ -49,8 +51,8 @@ public class ConfigUtil {
                     props.load(ConfigUtil.class.getResourceAsStream(file));
                     setAppKey(props.getProperty("illegal.appKey"));
                     setMetaServer(props.getProperty("illegal.metaServer"));
-                    setCollectInterval(Integer.valueOf(props.getProperty("illegal.collectInterval")));
-                    setReportCycle(Integer.valueOf(props.getProperty("illegal.reportCycle")));
+                    setCollectInterval(Integer.valueOf(props.getProperty("illegal.collectInterval", DEFAULT_COLLECT_INTERVAL + "")));
+                    setReportCycle(Integer.valueOf(props.getProperty("illegal.reportCycle", DEFAULT_REPORT_CYCLE + "")));
                 } catch (IOException e) {
                     log.error("load properties from file:{} fail", file, e);
                     e.printStackTrace();

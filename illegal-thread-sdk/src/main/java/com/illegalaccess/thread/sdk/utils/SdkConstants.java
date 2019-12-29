@@ -11,6 +11,7 @@ public class SdkConstants {
 
     public static final String MINUS                         = "-"                                   ;
     public static final String BLANK                         = ""                                    ;
-    public static final String INNER_POOL                    = "illegalInnerPool"                    ;
     public final static String EMPTY_JSON = "{}";
+
+    public final static String INNER_THREAD_POOL_NAME = "innerTracedThreadPool";
 }

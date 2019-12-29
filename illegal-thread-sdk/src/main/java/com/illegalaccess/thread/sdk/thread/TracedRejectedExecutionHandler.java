@@ -5,5 +5,5 @@ import java.util.concurrent.RejectedExecutionHandler;
 /**
  * Created by xiao on 2019/12/28.
  */
-public interface NamedRejectedExecutionHandler extends RejectedExecutionHandler {
+public interface TracedRejectedExecutionHandler extends RejectedExecutionHandler {
 }

@@ -2,13 +2,10 @@ package com.illegalaccess.thread.sdk.support;
 
 import com.illegalaccess.thread.sdk.bo.ThreadPoolReportReq;
 import com.illegalaccess.thread.sdk.metric.ThreadTaskMetric;
-import com.illegalaccess.thread.sdk.thread.NamedBoundedBlockingDeque;
-import com.illegalaccess.thread.sdk.thread.NamedBoundedBlockingQueue;
+import com.illegalaccess.thread.sdk.thread.TracedBoundedBlockingQueue;
 import com.illegalaccess.thread.sdk.utils.SdkConstants;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by xiao on 2019/12/21.
@@ -18,29 +15,52 @@ public enum MetricPipeline {
 
     Instance;
 
-    private BlockingDeque<ThreadTaskMetric> blockingDeque = new NamedBoundedBlockingDeque<>();
+    private ConcurrentMap<String, TracedBoundedBlockingQueue> queueHolder;
+    public final String INNER_SAVE_POINT_QUEUE = "innerSavePointQueue";
+    public final String INNER_THREAD_METRIC_QUEUE = "innerThreadMetricQueue";
+    public final String INNER_REPORT_TASK_QUEUE = "innerThreadReportQueue";
 
-    // todo 有瑕疵， 并没有和线程池挂钩
-    private BlockingQueue<ThreadPoolReportReq> metricReportQueue = new NamedBoundedBlockingQueue<>(SdkConstants.INNER_POOL);
-
-    public void transferThreadTaskMetric(ThreadTaskMetric threadTaskMetric) {
-        blockingDeque.add(threadTaskMetric);
+    MetricPipeline() {
+        queueHolder = new ConcurrentHashMap<>();
+        // 保存执行过程中，各个生命周期的时间点  的集合
+        queueHolder.put(INNER_SAVE_POINT_QUEUE, new TracedBoundedBlockingQueue<TaskLifecycleSavepoint>(INNER_SAVE_POINT_QUEUE));
+        // 数据类型和 <taskMetric> 一样，这个的数据接受者进行是否需要报警的计算
+        queueHolder.put(INNER_THREAD_METRIC_QUEUE, new TracedBoundedBlockingQueue<ThreadTaskMetric>(INNER_THREAD_METRIC_QUEUE));
+        // 收集好的 需要上报的数据
+        queueHolder.put(INNER_REPORT_TASK_QUEUE, new TracedBoundedBlockingQueue<ThreadPoolReportReq>(INNER_REPORT_TASK_QUEUE));
     }
 
-    public void revertThreadTaskMetric(ThreadTaskMetric threadTaskMetric) {
-        blockingDeque.addFirst(threadTaskMetric);
+    /**
+     * 发送消息
+     * @param source
+     * @param data
+     * @param <T>
+     */
+    public <T> void emit(String source, T data) {
+        TracedBoundedBlockingQueue queue = queueHolder.get(source);
+        if (queue == null) {
+            throw new IllegalArgumentException("source[" + source + "] is invalid");
+        }
+        queue.offer(data);
     }
 
-    public ThreadTaskMetric fetchThreadTaskMetric() throws InterruptedException {
-        return blockingDeque.poll(100, TimeUnit.MILLISECONDS);
-    }
-
-    public void transferThreadMetricReport(ThreadPoolReportReq reportBO) {
-        metricReportQueue.offer(reportBO);
-    }
-
-    public ThreadPoolReportReq fetchThreadMetricReport() throws InterruptedException {
-        return metricReportQueue.poll(100, TimeUnit.MILLISECONDS);
+    /**
+     * 获取消息
+     * @param source
+     * @param <T>
+     * @return
+     * @throws InterruptedException
+     */
+    public <T> T fetch(String source) throws InterruptedException {
+        TracedBoundedBlockingQueue queue = queueHolder.get(source);
+        if (queue == null) {
+            throw new IllegalArgumentException("source[" + source + "] is invalid");
+        }
+        Object data = queue.poll(100, TimeUnit.MILLISECONDS);
+        if (data == null) {
+            return null;
+        }
+        return (T) data;
     }
 
 }
