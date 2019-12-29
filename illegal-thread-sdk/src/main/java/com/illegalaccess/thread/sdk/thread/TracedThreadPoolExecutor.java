@@ -12,13 +12,6 @@ public class NamedThreadPoolExecutor extends ThreadPoolExecutor {
 
     private String threadPoolName;
 
-    public NamedThreadPoolExecutor(String threadPoolName) {
-        super(1,1, 1, TimeUnit.MINUTES, new NamedBoundedBlockingQueue<>(threadPoolName));
-        this.threadPoolName = threadPoolName;
-        // todo MetaServiceClient 从服务端获取配置信息
-
-    }
-
     public NamedThreadPoolExecutor(String threadPoolName, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
         this.threadPoolName = threadPoolName;

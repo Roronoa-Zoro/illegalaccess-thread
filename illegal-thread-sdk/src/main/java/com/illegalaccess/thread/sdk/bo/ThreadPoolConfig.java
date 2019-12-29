@@ -22,6 +22,11 @@ public class ThreadPoolConfig implements Serializable {
     private int keepAliveTime;
     // 阻塞队列的长度
     private int queueLength;
+    // 线程任务数据收集比例，默认10，即每执行10（N）个任务收集一次数据
+    private int collectRatio = 10;
+    // 配置信息的版本号
+    private int version;
 
     private ThreadPoolAlarmConfig alarmConfig;
+
 }

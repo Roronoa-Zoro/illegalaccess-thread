@@ -40,7 +40,6 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public boolean add(E e) {
-        System.out.println("add........");
         boolean offered = super.add(e);
         if (offered) {
             TaskWaiting.putStartTime(e, System.currentTimeMillis());
@@ -50,14 +49,12 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public void put(E e) throws InterruptedException {
-        System.out.println("put........");
         super.put(e);
         TaskWaiting.putStartTime(e, System.currentTimeMillis());
     }
 
     @Override
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        System.out.println("offer timeout........");
         boolean offered = super.offer(e, timeout, unit);
         if (offered) {
             TaskWaiting.putStartTime(e, System.currentTimeMillis());
@@ -67,7 +64,6 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public boolean offer(E e) {
-        System.out.println("offer........" + e);
         boolean offered =  super.offer(e);
         if (offered) {
             TaskWaiting.putStartTime(e, System.currentTimeMillis());
@@ -77,9 +73,7 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public E take() throws InterruptedException {
-
         E result = super.take();
-        System.out.println("take...." + result);
         if (result != null) {
             Long start = TaskWaiting.clearTask(result);
             System.out.println("task waiting in queue is:" + (System.currentTimeMillis() - start));
@@ -89,7 +83,6 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        System.out.println("poll timeout....");
         E result = super.poll(timeout, unit);
         if (result != null) {
             Long start = TaskWaiting.clearTask(result);
@@ -100,7 +93,6 @@ public class NamedBoundedBlockingQueue<E> extends ArrayBlockingQueue<E> {
 
     @Override
     public E poll() {
-        System.out.println("poll....");
         E result = super.poll();
         if (result != null) {
             Long start = TaskWaiting.clearTask(result);
