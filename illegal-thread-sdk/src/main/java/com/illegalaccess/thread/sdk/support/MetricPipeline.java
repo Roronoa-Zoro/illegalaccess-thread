@@ -3,7 +3,7 @@ package com.illegalaccess.thread.sdk.support;
 import com.illegalaccess.thread.sdk.bo.ThreadPoolReportReq;
 import com.illegalaccess.thread.sdk.metric.ThreadTaskMetric;
 import com.illegalaccess.thread.sdk.thread.TracedBoundedBlockingQueue;
-import com.illegalaccess.thread.sdk.utils.SdkConstants;
+
 
 import java.util.concurrent.*;
 

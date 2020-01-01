@@ -1,8 +1,6 @@
 package com.illegalaccess.thread.sdk.thread;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.TimeUnit;
 
 /**
