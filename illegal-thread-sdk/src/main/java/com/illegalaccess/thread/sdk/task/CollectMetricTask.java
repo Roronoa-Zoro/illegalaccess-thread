@@ -64,15 +64,8 @@ public class CollectMetricTask implements Runnable {
             }
 
             // todo 获取线程池的运行时数据
-            Collection<TracedThreadPoolExecutor> executors = tracedThreadPoolManager.getTracedThreadPoolExecutors();
-            executors.forEach(executor -> {
-                ThreadPoolMetric poolMetric = new ThreadPoolMetric();
-                poolMetric.setPoolName(executor.getThreadPoolName());
-                poolMetric.setCoreCnt(executor.getCorePoolSize());
-                poolMetric.setActiveCnt(executor.getActiveCount());
-                poolMetric.setCurrentCnt(executor.getPoolSize());
-                poolMetric.setMaxCnt(executor.getMaximumPoolSize());
-                poolMetric.setPendingTaskCnt(executor.getQueue().size());
+            Collection<ThreadPoolMetric> executors = tracedThreadPoolManager.pickUpThreadPoolMetric();
+            executors.forEach(poolMetric -> {
                 ThreadPoolMetricPool.Instance.addThreadPoolMetric(poolMetric);
             });
 

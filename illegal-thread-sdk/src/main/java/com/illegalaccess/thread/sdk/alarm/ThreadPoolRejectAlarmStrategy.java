@@ -2,9 +2,10 @@ package com.illegalaccess.thread.sdk.alarm;
 
 
 import com.illegalaccess.thread.sdk.bo.ThreadPoolAlarmConfig;
-import com.illegalaccess.thread.sdk.thread.TracedThreadPoolExecutor;
-
-import java.util.concurrent.atomic.AtomicLong;
+import com.illegalaccess.thread.sdk.metric.ThreadTaskMetric;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xiao on 2019/12/28.
@@ -13,10 +14,21 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ThreadPoolRejectAlarmStrategy implements ThreadPoolAlarmStrategy {
     private static final long serialVersionUID = -2715704871997116354L;
 
-    private AtomicLong rejectCounter = new AtomicLong(0);
+    private ConcurrentMap</*threadPoolName*/String, AtomicInteger> threadPoolRejectCounter = new ConcurrentHashMap<>();
 
     @Override
-    public boolean triggerAlarm(TracedThreadPoolExecutor executor, ThreadPoolAlarmConfig alarmConfig) {
+    public boolean triggerAlarm(ThreadTaskMetric metric, ThreadPoolAlarmConfig alarmConfig) {
+        AtomicInteger counter = threadPoolRejectCounter.get(metric.getPoolName());
+        if (counter == null) {
+            threadPoolRejectCounter.putIfAbsent(metric.getPoolName(), new AtomicInteger(0));
+            counter = threadPoolRejectCounter.get(metric.getPoolName());
+        }
+        int count = counter.incrementAndGet();
+        if (count >= alarmConfig.getRejectNums()) {
+            counter.getAndAdd(-alarmConfig.getRejectNums());
+            return true;
+        }
+
         return false;
     }
 }

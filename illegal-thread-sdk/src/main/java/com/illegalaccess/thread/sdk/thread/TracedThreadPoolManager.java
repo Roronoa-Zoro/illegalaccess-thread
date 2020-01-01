@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import com.illegalaccess.thread.sdk.bo.ThreadPoolAlarmConfig;
 import com.illegalaccess.thread.sdk.bo.ThreadPoolConfig;
+import com.illegalaccess.thread.sdk.metric.ThreadPoolMetric;
+import com.illegalaccess.thread.sdk.support.ThreadPoolMetricPool;
 import com.illegalaccess.thread.sdk.task.CollectAlarmTask;
 import com.illegalaccess.thread.sdk.task.CollectMetricTask;
 import com.illegalaccess.thread.sdk.task.ReportMetricTask;
@@ -25,9 +27,14 @@ public class TracedThreadPoolManager {
     private ConcurrentMap<String, TracedThreadPoolExecutor> tracedThreadPoolExecutors = new ConcurrentHashMap<>();
     private ConcurrentMap<String, ThreadPoolConfig> threadPoolConfigMap = new ConcurrentHashMap<>();
     private ConcurrentMap<String, ThreadPoolAlarmConfig> threadPoolAlarmConfigMap = new ConcurrentHashMap<>();
+
     private AtomicBoolean taskStarted = new AtomicBoolean(false);
     private ExecutorService innerThreadPool;
 
+    /**
+     * 订阅线程池创建事件
+     * @param arg
+     */
     @Subscribe
     public void namedThreadPoolCreationEventListener(TracedThreadPoolExecutor arg) {
         // todo arg是NamedThreadPoolExecutor，把它加入到list， 然后启动线程任务
@@ -42,12 +49,16 @@ public class TracedThreadPoolManager {
     }
 
     // todo
+
+    /**
+     * 订阅线程池配置事件
+     * @param threadPoolConfigs
+     */
     @Subscribe
     public void threadPoolConfigChangeEventListener(List<ThreadPoolConfig> threadPoolConfigs) {
         if (threadPoolConfigs == null || threadPoolConfigs.isEmpty()) {
             return;
         }
-
 
         for (ThreadPoolConfig threadPoolConfig : threadPoolConfigs) {
             ThreadPoolConfig localPoolConfig = threadPoolConfigMap.get(threadPoolConfig.getPoolName());
@@ -55,7 +66,7 @@ public class TracedThreadPoolManager {
                 threadPoolConfigMap.put(threadPoolConfig.getPoolName(), threadPoolConfig);
                 continue;
             }
-            if (threadPoolConfig.getVersion() == localPoolConfig.getVersion()) {
+            if (threadPoolConfig.getVersion() <= localPoolConfig.getVersion()) {
                 continue; // config is not changed
             }
 
@@ -91,13 +102,37 @@ public class TracedThreadPoolManager {
         if (taskStarted.compareAndSet(false, true)) {
             innerThreadPool = TracedExecutors.newThreadPoolExecutor(SdkConstants.INNER_THREAD_POOL_NAME, 3, 3, 5, TimeUnit.MINUTES, 1);
             innerThreadPool.submit(new CollectMetricTask(this));
-            innerThreadPool.submit(new CollectAlarmTask());
+            innerThreadPool.submit(new CollectAlarmTask(this));
             innerThreadPool.submit(new ReportMetricTask());
         }
     }
 
-    public Collection<TracedThreadPoolExecutor> getTracedThreadPoolExecutors() {
+    /**
+     * 返回线程池的报警配置信息
+     * @param threadPoolName
+     * @return
+     */
+    public ThreadPoolAlarmConfig pickUpAlarmConfig(String threadPoolName) {
+        return threadPoolAlarmConfigMap.get(threadPoolName);
+    }
 
-        return tracedThreadPoolExecutors.values();
+    /**
+     * 返回各个线程池的运行时指标
+     * @return
+     */
+    public Collection<ThreadPoolMetric> pickUpThreadPoolMetric() {
+        Collection<TracedThreadPoolExecutor> executors = tracedThreadPoolExecutors.values();
+        Collection<ThreadPoolMetric> data = new ArrayList<>(executors.size());
+        executors.forEach(executor -> {
+            ThreadPoolMetric poolMetric = new ThreadPoolMetric();
+            poolMetric.setPoolName(executor.getThreadPoolName());
+            poolMetric.setCoreCnt(executor.getCorePoolSize());
+            poolMetric.setActiveCnt(executor.getActiveCount());
+            poolMetric.setCurrentCnt(executor.getPoolSize());
+            poolMetric.setMaxCnt(executor.getMaximumPoolSize());
+            poolMetric.setPendingTaskCnt(executor.getQueue().size());
+            data.add(poolMetric);
+        });
+        return data;
     }
 }

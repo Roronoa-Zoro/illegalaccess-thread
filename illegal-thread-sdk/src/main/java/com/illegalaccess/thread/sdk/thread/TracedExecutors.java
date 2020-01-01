@@ -1,5 +1,11 @@
 package com.illegalaccess.thread.sdk.thread;
 
+import com.illegalaccess.thread.sdk.bo.ThreadPoolConfig;
+import com.illegalaccess.thread.sdk.client.MetaClientFactory;
+import com.illegalaccess.thread.sdk.support.NamedThreadPoolEventSource;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +26,15 @@ public class TracedExecutors {
      */
     public static ExecutorService newThreadPoolExecutor(String threadPoolName) {
         // todo
-        return null;
+        ThreadPoolConfig config = MetaClientFactory.getClient().fetchThreadPoolConfig(threadPoolName);
+        if (config == null) {
+            throw new IllegalArgumentException("threadPoolName:{} is not configured");
+        }
+
+        TracedThreadPoolExecutor executor = new TracedThreadPoolExecutor(threadPoolName, config.getCoreSize(), config.getMaxSize(), config.getKeepAliveTime(), TimeUnit.SECONDS, new TracedBoundedBlockingQueue<>(threadPoolName, config.getQueueLength()), new TracedThreadFactory(threadPoolName));
+        NamedThreadPoolEventSource.Instance.publishThreadPoolConfigChangeEvent(Arrays.asList(config));
+        return executor;
+
     }
 
     public static ExecutorService newThreadPoolExecutor(String threadPoolName, int coreSize, int maxSize, int keepAliveTime, TimeUnit unit, int queueLength) {

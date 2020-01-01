@@ -160,6 +160,10 @@ public class TracedBoundedBlockingQueue<E> extends AbstractQueue<E>
         this(poolName, DEFAULT_CAPACITY);
     }
 
+    public TracedBoundedBlockingQueue(int capacity) {
+        this(null, DEFAULT_CAPACITY);
+    }
+
     /**
      * Creates a {@code TracedBoundedBlockingQueue} with the given (fixed) capacity.
      *

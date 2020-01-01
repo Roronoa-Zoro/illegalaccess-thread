@@ -4,9 +4,6 @@ package com.illegalaccess.thread.sdk.thread;
 import com.illegalaccess.thread.sdk.support.NamedThreadPoolEventSource;
 import com.illegalaccess.thread.sdk.support.TaskLifecycleTracer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.*;
 
 /**

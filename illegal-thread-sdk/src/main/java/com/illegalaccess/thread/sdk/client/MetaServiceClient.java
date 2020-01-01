@@ -1,6 +1,6 @@
 package com.illegalaccess.thread.sdk.client;
 
-import com.illegalaccess.thread.sdk.alarm.ThreadPoolAlarmStrategy;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolAlarmReq;
 import com.illegalaccess.thread.sdk.bo.ThreadPoolConfig;
 import com.illegalaccess.thread.sdk.bo.ThreadPoolReportReq;
 import com.illegalaccess.thread.sdk.support.ConfigUtil;
@@ -22,7 +22,6 @@ public class MetaServiceClient {
     private MetaServiceClientDelegate delegate = new MetaServiceClientDelegate();
 
     public List<ThreadPoolConfig> reportThreadPoolMetric(ThreadPoolReportReq reportBO) {
-
         Optional<String> resp = safeHttpInvoke(ConfigUtil.META_SERVER + ConfigUtil.REPORT_THREAD_POOL_METRIC_URI, reportBO);
         String realData = resp.orElse("");
         if (SdkConstants.BLANK.equals(realData)) {
@@ -36,14 +35,28 @@ public class MetaServiceClient {
         return data;
     }
 
-    public Object reportThreadPoolAlarm(ThreadPoolAlarmStrategy alarmBO) {
+    /**
+     * 上报异常报警
+     * @param alarmReq
+     * @return
+     */
+    public Object reportThreadPoolAlarm(ThreadPoolAlarmReq alarmReq) {
+        Optional<String> resp = safeHttpInvoke(ConfigUtil.META_SERVER + ConfigUtil.REPORT_THREAD_POOL_ALARM_URI, alarmReq);
+
         // todo
         return null;
     }
 
-    public List<ThreadPoolConfig> fetchThreadPoolConfig() {
+    public ThreadPoolConfig fetchThreadPoolConfig(String threadPoolName) {
         // todo
-        return null;
+        Optional<String> resp = safeHttpInvoke(ConfigUtil.META_SERVER + ConfigUtil.REPORT_THREAD_POOL_METRIC_URI, threadPoolName);
+        String realData = resp.orElse("");
+        if (SdkConstants.BLANK.equals(realData)) {
+            return null;
+        }
+        Optional<ThreadPoolConfig> optional = JsonUtil.string2Object(realData, ThreadPoolConfig.class);
+
+        return optional.orElse(null);
     }
 
     private <T> Optional<String> safeHttpInvoke(String fullUrl, T data) {

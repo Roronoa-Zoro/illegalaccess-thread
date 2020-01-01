@@ -28,12 +28,14 @@ public class ThreadPoolAlarmConfig implements Serializable {
 
     /**
      * 当 alarmConfigType = Task_Cost_Strategy 生效
+     * 任务的数量
      */
     private int taskNums;
     /**
      * 当 alarmConfigType = Task_Cost_Strategy 生效
+     * 执行超时阈值
      */
-    private int execThreshold;
+    private long execThreshold;
 
 
     private int version;

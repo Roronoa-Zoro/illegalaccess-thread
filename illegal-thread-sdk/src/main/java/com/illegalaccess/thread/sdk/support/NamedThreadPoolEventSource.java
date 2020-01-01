@@ -1,8 +1,11 @@
 package com.illegalaccess.thread.sdk.support;
 
 import com.google.common.eventbus.EventBus;
+import com.illegalaccess.thread.sdk.bo.ThreadPoolConfig;
 import com.illegalaccess.thread.sdk.thread.TracedThreadPoolExecutor;
 import com.illegalaccess.thread.sdk.thread.TracedThreadPoolManager;
+
+import java.util.List;
 
 
 /**
@@ -26,7 +29,7 @@ public enum NamedThreadPoolEventSource {
     }
 
     // todo
-    public void publishThreadPoolConfigChangeEvent() {
-
+    public void publishThreadPoolConfigChangeEvent(List<ThreadPoolConfig> threadPoolConfigList) {
+        eventBus.post(threadPoolConfigList);
     }
 }

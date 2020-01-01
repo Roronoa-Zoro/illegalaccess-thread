@@ -17,5 +17,13 @@ public enum ThreadPoolAlarmTypeEnum {
     private int type;
     private String desc;
 
+    public static ThreadPoolAlarmTypeEnum getEnumByCode(int type) {
+        for (ThreadPoolAlarmTypeEnum enums : ThreadPoolAlarmTypeEnum.values()) {
+            if (enums.type == type) {
+                return enums;
+            }
+        }
+        return null;
+    }
 
 }
