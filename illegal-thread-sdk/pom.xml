@@ -17,7 +17,7 @@
         <lombok.version>1.18.8</lombok.version>
         <slf4j.version>1.7.29</slf4j.version>
         <guava.version>28.0-jre</guava.version>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
     </properties>
 
     <dependencies>
